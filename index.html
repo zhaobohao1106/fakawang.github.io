@@ -1,0 +1,38 @@
+// 动态加载分类和商品
+async function loadData() {
+    const res = await fetch('products.json');
+    const data = await res.json();
+    
+    // 加载分类（此处默认选中第一个分类，可根据需求修改）
+    const categoryInput = document.querySelector('.select-input[value*="PUBG国际-苹果免越狱"]');
+    categoryInput.value = data.categories[0].name;
+    categoryInput.dataset.id = data.categories[0].id;
+
+    // 商品选择框点击加载对应分类商品
+    const productInput = document.querySelector('.select-input[placeholder="请选择商品"]');
+    productInput.addEventListener('click', async () => {
+        const cateId = parseInt(categoryInput.dataset.id);
+        const products = data.products.filter(p => p.categoryId === cateId);
+        if(products.length === 0) {
+            alert('该分类下暂无商品！');
+            return;
+        }
+        // 模拟商品选择（实际可做下拉选择框）
+        const productNames = products.map(p => p.name).join('\n');
+        const selected = prompt('请选择商品：\n' + productNames);
+        if(selected) productInput.value = selected;
+    });
+
+    // 立即购买按钮交互
+    const buyBtn = document.querySelector('.buy-btn');
+    buyBtn.addEventListener('click', () => {
+        if(!productInput.value) {
+            alert('请先选择商品！');
+            return;
+        }
+        alert(`已选择【${productInput.value}】，跳转到支付页面...`);
+    });
+}
+
+// 初始化加载数据
+loadData();
